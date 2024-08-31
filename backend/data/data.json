@@ -1,0 +1,53 @@
+[
+    {
+        "title":"A guide to Sri Lanka’s south coast beaches",
+
+        "body":"Wondering which of Sri Lanka’s south coast beaches is the best fit for you? Use this guide to discover the ins and outs of the main hotspots, from world-class surfing spots to idyllic peaceful properties.Wend your way out to the eastern end of the south coast and you’ll arrive at Arugam Bay. Surfing is spectacular here – so much so that it’s ranked as one of the top destinations in the world to catch a wave. From beginner-friendly bays to point breaks that connoisseurs will find challenging, there’s a wealth of options for rewarding surfing. The main town is situated right on the coastline and has an alluring atmosphere that encourages lazy days when you’re not on the waves. Rise early to watch a mesmerizing sunrise, stroll the nearby cultural sites or sit back and relax in a sea-side café. ",
+
+        "images":[
+           {"image":"images/blog_image/1.jpg"}
+        ],
+
+        "category":"Travel Blogs",
+
+        "author":"Sharangan",
+        "authorId":"6639c293f36ba127521d21fd"
+
+
+    },
+
+    {
+        "title":"Sacred Adam’s Peak",
+
+        "body":"For those who can bear the idea of hiking through the night, climbing the steps to the summit of Adam’s Peak is infinitely rewarding. This mountain is sacred to local Buddhists, Christians, Muslims and Hindus and between December and March thousands of pilgrims make the climb. Set out between midnight at 2pm depending on your preferred pace to ensure you reach the top by dawn to witness one of the most spectacular sunrises in Asia. As you walk, listen to the chanting of your fellow hikers and stop off to sample local delicacies served from stalls alongside the path.",
+
+        "images":[
+           {"image":"images/blog_image/2.jpg"}
+        ],
+
+        "category":"Travel Blogs",
+
+        "author":"Sharangan",
+
+        "authorId":"6639c293f36ba127521d21fd"
+
+
+    },
+
+    {
+        "title":"Anuradhapura",
+
+        "body":"Sigiriya is in the middle of Sri Lanka’s Cultural Triangle, but Anuradhapura is its ancient heart. Here you can discover the origins of Sri Lankan civilization and experience restful ruins without the crowds. The UNESCO city of Anuradhapura is a must-see. The expansive complex spreads out around enormous water tanks, so bikes are the most convenient way to explore the site. Ride the flat paths between the palace ruins, marvelling at the incredible irrigation system and centuries-old sacred Bo tree. Nearby is the mysterious monastery hidden within Ritigala Forest, and the sacred mountain Mihintale where Buddhism was first brought to Sri Lanka.",
+
+        "images":[
+           {"image":"images/blog_image/3.jpg"}
+        ],
+
+        "category":"Travel Blogs",
+
+        "author":"Sharangan",
+        "authorId":"6639c293f36ba127521d21fd"
+
+
+    }
+]
