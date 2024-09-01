@@ -5,6 +5,7 @@ const user = require('./routes/userRoute');
 const middlewareError = require('./middlewares/error');
 const cookieParser= require("cookie-parser")
 const path = require("path")
+const dotenv = require('dotenv');
 
 app.use(express.json());
 app.use(cookieParser());
@@ -13,9 +14,11 @@ app.use('/upload',express.static(path.join(__dirname,'upload')))
 app.use('/api/sh/',blog);
 app.use('/api/sh/',user)
 
-process.env.NODE_ENV = process.env.NODE_ENV || 'production';
+dotenv.config({path:path.join(__dirname,"config","config.env")});
 
-if(process.env.NODE_ENV ==='development'){
+// process.env.NODE_ENV = process.env.NODE_ENV || 'production';
+
+if(process.env.NODE_ENV ==='production'){
     app.use(express.static(path.join(__dirname,'../frontend/build')))
     app.get('*',(req,res)=>{
         res.sendFile(path.resolve(__dirname,'../frontend/build/index.html'))
