@@ -83,16 +83,16 @@ exports.logoutUser = (req, res, next) => {
     // Clear the 'token' cookie
     res.clearCookie('token', {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production', // Secure flag
-        sameSite: process.env.NODE_ENV === 'production' ? 'Strict' : 'Lax', // SameSite attribute
+        secure: true,
+        sameSite:Strict 
     });
 
     // Optionally set the cookie to null
     res.cookie('token', null, {
         expires: new Date(Date.now()),
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production', // Secure flag
-        sameSite: process.env.NODE_ENV === 'production' ? 'Strict' : 'Lax', // SameSite attribute
+        secure: true,
+        sameSite:Strict 
     }).status(200).json({
         success: true,
         message: "Logout Successfully"
