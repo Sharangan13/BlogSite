@@ -222,36 +222,40 @@ exports.changePassword = catchAsyncError(async (req,res,next)=>{
 
 // Update User Profile
 
-exports.updateProfile = catchAsyncError(async (req,res,next)=>{
-    let newUserData = {
-        name:req.body.name,
-        email:req.body.email
-    }
+exports.updateProfile = catchAsyncError(async (req, res, next) => {
+    // Prepare new user data
+    const newUserData = {
+        name: req.body.name,
+        email: req.body.email,
+    };
 
     let avatar;
-    
-    let BASE_URL=process.env.BACKEND_URL;
-    if(process.env.NODE_ENV==="production"){
-        BASE_URL=`${req.protocol}://${req.get('host')}`
-    }
-    if(req.file){
-        avatar=`${BASE_URL}/upload/user/${req.file.originalname}`
-        newUserData={...newUserData,avatar}
+
+    // Determine base URL
+    let BASE_URL = process.env.BACKEND_URL || '';
+    if (process.env.NODE_ENV === 'production') {
+        BASE_URL = `${req.protocol}://${req.get('host')}`;
     }
 
-    const user = await userModel.findByIdAndUpdate(req.user.id, newUserData,{
-        new:true,
-        runValidators:true
-    })
+    // Handle avatar upload
+    if (req.file) {
+        avatar = `${BASE_URL}/upload/user/${req.file.originalname}`;
+        newUserData.avatar = avatar;
+    }
 
+    // Update user profile
+    const user = await userModel.findByIdAndUpdate(req.user.id, newUserData, {
+        new: true,
+        runValidators: true,
+    });
+
+    // Send response
     res.status(200).json({
-        success:true,
-        message:"Profile updated",
-        user
-       })
-
-
-})
+        success: true,
+        message: 'Profile updated',
+        user,
+    });
+});
 
 
 
