@@ -12,6 +12,9 @@
     }
   ],
   "routes": [
-    { "src": "/(.*)", "dest": "/build/index.html" }
+    { 
+      "src": "/(.*)", 
+      "dest": "backend/build/index.html"
+    }
   ]
 }
