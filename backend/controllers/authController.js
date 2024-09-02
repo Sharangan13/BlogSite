@@ -5,6 +5,7 @@ const sendEmail = require("../util/email");
 const ErrorHandler = require("../util/errorHandler");
 const sendToken = require("../util/jwtken");
 const crypto  = require("crypto");
+const { strict } = require("assert");
 
 
 
@@ -82,7 +83,9 @@ exports.loginUser = catchAsyncError(async(req,res,next)=>{
 exports.logoutUser = (req,res,next)=>{
     res.cookie('token',null,{
         expires: new Date(Date.now()),
-        httpOnly:true
+        httpOnly:true,
+        secure:true,
+        samesite:strict
     }).status(200).json({
         success:true,
         message:"Logout Succesfully"
