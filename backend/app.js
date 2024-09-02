@@ -26,7 +26,7 @@ dotenv.config({path:path.join(__dirname,"config","config.env")});
 //     console.log(`Environment: is ..................${process.env.NODE_ENV}`)
 // }
 
-if(process.env.NODE_ENV ==='production'){
+if(process.env.NODE_ENV ==='qproductionq'){
     app.use(express.static(path.join(__dirname,'/build')))
     app.get('*',(req,res)=>{
         res.sendFile(path.resolve(__dirname,'/build/index.html'))
