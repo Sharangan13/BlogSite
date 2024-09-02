@@ -85,7 +85,7 @@ exports.logoutUser = (req,res,next)=>{
         expires: new Date(Date.now()),
         httpOnly:true,
         secure:true,
-        samesite:strict
+        sameSite:strict
     }).status(200).json({
         success:true,
         message:"Logout Succesfully"
