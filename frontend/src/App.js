@@ -32,10 +32,10 @@ import AdminUpdateAdminDetails from './components/admin/UpdateAdminDetails';
 
 function App() {
 
-  // useEffect(()=>{
-  //    store.dispatch(loadUser)
+  useEffect(()=>{
+     store.dispatch(loadUser)
 
-  // })
+  })
 
 
 
