@@ -26,13 +26,13 @@ dotenv.config({path:path.join(__dirname,"config","config.env")});
 //     console.log(`Environment: is ..................${process.env.NODE_ENV}`)
 // }
 
-if(process.env.NODE_ENV ==='production'){
-    app.use(express.static(path.join(__dirname,'/build')))
-    app.get('*',(req,res)=>{
-        res.sendFile(path.resolve(__dirname,'build/index.html'))
-    })
-    console.log(`Environment: is ..................${process.env.NODE_ENV}`)
-}
+// if(process.env.NODE_ENV ==='production'){
+//     app.use(express.static(path.join(__dirname,'/build')))
+//     app.get('*',(req,res)=>{
+//         res.sendFile(path.resolve(__dirname,'build/index.html'))
+//     })
+//     console.log(`Environment: is ..................${process.env.NODE_ENV}`)
+// }
 
 app.use(middlewareError);
 module.exports = app;
