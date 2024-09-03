@@ -4,28 +4,16 @@ const router = express.Router();
 const {isAuthendicatedUser,authorizeRole}= require("../middlewares/authendicate")
 const multer = require("multer")
 const path = require("path")
-const fs = require('fs');
 
 
-
-// Ensure the upload directory exists
-const uploadDir = path.join(__dirname, '..', 'upload/blog');
-
-if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir, { recursive: true });
-}
-
-// Set up multer to store files on the server
-const upload = multer({
-    storage: multer.diskStorage({
-        destination: function (req, file, cb) {
-            cb(null, uploadDir);
-        },
-        filename: function (req, file, cb) {
-            cb(null, file.originalname);
-        }
-    })
-});
+const upload=multer({storage:multer.diskStorage({
+    destination:function(req,file,cb){
+        cb(null, path.join(__dirname,'..','upload/blog'))
+    },
+    filename:function(req,file,cb){
+        cb(null,file.originalname)
+    }
+})})
 
 router.route('/blog').get(getBlogs);
 

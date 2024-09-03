@@ -60,17 +60,17 @@ exports.createNewBlog = catchAsyncError(async(req, res, next) => {
 
 
   let images = []
-    // let BASE_URL = process.env.BACKEND_URL;
-    // if(process.env.NODE_ENV === "production"){
-    //     BASE_URL = `${req.protocol}://${req.get('host')}`
-    // }
+    let BASE_URL = process.env.BACKEND_URL;
+    if(process.env.NODE_ENV === "production"){
+        BASE_URL = `${req.protocol}://${req.get('host')}`
+    }
     
-    if (req.files && req.files.length > 0) {
-      req.files.forEach(file => {
-          let url = `/upload/blog/${file.originalname}`;
-          images.push({ image: url });
-      });
-  }
+    if(req.files && req.files.length > 0) {
+        req.files.forEach( file => {
+            let url = `${BASE_URL}/upload/blog/${file.originalname}`;
+            images.push({ image: url })
+        })
+    }
 
     req.body.images = images;
 
