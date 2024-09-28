@@ -9,7 +9,7 @@ import { adminGetBlogs } from "../../actions/BlogsActions";
 import Loader from "../layouts/Loder";
 import { deleteBlog } from "../../actions/BlogActions";
 import { clearBlogDeleted } from "../../slices/BlogSlice";
-import { MdCancel } from "react-icons/md";
+import { IoClose } from "react-icons/io5";
 
 
 export default function BlogList() {
@@ -121,7 +121,7 @@ export default function BlogList() {
             <Modal show={showModal} onHide={handleCancelDelete}>
                 <Modal.Header>
                     <Modal.Title>Confirm Deletion</Modal.Title>
-                    <MdCancel onClick={handleCancelDelete}
+                    <IoClose onClick={handleCancelDelete}
                     style={{ cursor: 'pointer', fontSize: '1.5rem' }}/>
                 </Modal.Header>
                 <Modal.Body>Are you sure you want to delete this blog?</Modal.Body>

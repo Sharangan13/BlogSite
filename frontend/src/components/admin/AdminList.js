@@ -1,19 +1,19 @@
-import { Fragment, useEffect } from "react";
-import { Button } from "react-bootstrap";
+import { Fragment, useEffect, useState } from "react";
+import { Button, Modal } from "react-bootstrap"; // Import Modal from Bootstrap
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
+import { IoClose } from "react-icons/io5";
 import { MDBDataTable } from "mdbreact";
 import { toast } from "react-toastify";
 import Sidebar from "./Sidebar";
 import { adminDeleteUserSuccess, clearError } from "../../slices/UsersSlice";
-
-import {
-  AdminDeleteUser,
-  adminGetUsersDetails,
-} from "../../actions/AdminAction";
+import { AdminDeleteUser, adminGetUsersDetails } from "../../actions/AdminAction";
 import Loader from "../layouts/Loder";
 
 export default function AdminList() {
+  const [show, setShow] = useState(false); // Modal visibility state
+  const [adminIdToDelete, setAdminIdToDelete] = useState(null); // Track admin ID to delete
+
   const truncateText = (text, charLimit) => {
     if (text.length > charLimit) {
       return text.slice(0, charLimit) + "...";
@@ -49,7 +49,6 @@ export default function AdminList() {
           field: "email",
           sort: "asc",
         },
-
         {
           label: "Actions",
           field: "actions",
@@ -77,7 +76,7 @@ export default function AdminList() {
                 </Link>
               )}{" "}
               <Button
-                onClick={(e) => deleteHandler(e, user._id)}
+                onClick={() => handleDeleteClick(user._id)} // Open modal to confirm deletion
                 className="btn btn-danger py-1 px-2 ml-2"
                 disabled={user._id === currentUser._id}
               >
@@ -92,10 +91,17 @@ export default function AdminList() {
     return data;
   };
 
-  const deleteHandler = (e, id) => {
-    e.target.disabled = true;
-    dispatch(AdminDeleteUser(id));
+  const handleDeleteClick = (id) => {
+    setAdminIdToDelete(id); // Set the admin to be deleted
+    setShow(true); // Show the confirmation modal
   };
+
+  const handleConfirmDelete = () => {
+    dispatch(AdminDeleteUser(adminIdToDelete)); // Dispatch delete action
+    setShow(false); // Close modal after confirming delete
+  };
+
+  const handleClose = () => setShow(false); // Close modal without deleting
 
   useEffect(() => {
     if (error) {
@@ -109,7 +115,7 @@ export default function AdminList() {
       return;
     }
     if (isAdminDeleteUser) {
-      toast("Admin Deleted Succesfully!", {
+      toast("Admin Deleted Successfully!", {
         type: "success",
         position: "bottom-center",
         onOpen: () => dispatch(adminDeleteUserSuccess()),
@@ -139,6 +145,26 @@ export default function AdminList() {
             />
           )}
         </Fragment>
+
+        {/* Bootstrap Modal for confirmation */}
+        <Modal show={show} onHide={handleClose}>
+          <Modal.Header>
+            <Modal.Title>Confirm Delete</Modal.Title>
+            <IoClose onClick={handleClose}
+                    style={{ cursor: 'pointer', fontSize: '1.5rem' }}/>
+          </Modal.Header>
+          <Modal.Body>
+            Are you sure you want to delete this admin? This action cannot be undone.
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={handleClose}>
+              Cancel
+            </Button>
+            <Button variant="danger" onClick={handleConfirmDelete}>
+              Confirm Delete
+            </Button>
+          </Modal.Footer>
+        </Modal>
       </div>
     </div>
   );
