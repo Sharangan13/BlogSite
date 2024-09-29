@@ -1,4 +1,4 @@
-const { put } = require('@vercel/blob'); // Corrected import
+const { put } = require('@vercel/blob'); 
 const catchAsyncError = require("../middlewares/catchAsyncError");
 const blogModel = require("../models/blogModel");
 const APIFeatures = require("../util/apiFeatures");
@@ -71,7 +71,7 @@ exports.createNewBlog = catchAsyncError(async (req, res, next) => {
   try {
       for (const file of files) {
           console.log("Uploading:", file.originalname);
-          console.log("File Buffer:", file.buffer);
+          // console.log("File Buffer:", file.buffer);
 
           const upload = await put(file.originalname, file.buffer, { access: 'public', token: uploadToken });
           const url = upload.url;
@@ -100,49 +100,62 @@ exports.createNewBlog = catchAsyncError(async (req, res, next) => {
 
 // 04. Update Blog         URL = http://localhost:8000/api/sh/blog/:id     -------------------------------------------------------------------
 
-exports.updateBlog = async (req, res, next) => {
+exports.updateBlog = catchAsyncError(async (req, res, next) => {
   let blog = await blogModel.findById(req.params.id);
 
-  //image upload
-  let images = []
-
-  // if images not cleared we keep existing images
-  if(req.body.imagesCleared === 'false'){
-    images =blog.images;
+  if (!blog) {
+    return res.status(404).json({
+      success: false,
+      message: "Blog not found",
+    });
   }
-    let BASE_URL = process.env.BACKEND_URL;
-    if(process.env.NODE_ENV === "production"){
-        BASE_URL = `${req.protocol}://${req.get('host')}`
+
+  // Initialize an array for images
+  let images = [];
+
+  // If images are not cleared, keep existing images
+  if (req.body.imagesCleared === 'false') {
+    images = blog.images;
+  }
+
+  // Check for the upload token
+  const uploadToken = "vercel_blob_rw_lUSA2go8ipySDpex_w6tss9owH4MW6R9MMQNpNOMIghabA3";
+  if (!uploadToken) {
+    console.error("Upload token not found!");
+    return next(new ErrorHandler("Upload token is missing", 500));
+  }
+
+  // Handle new file uploads
+  if (req.files && req.files.length > 0) {
+    try {
+      for (const file of req.files) {
+        console.log("Uploading:", file.originalname);
+        // Upload the file to Vercel Blob
+        const upload = await put(file.originalname, file.buffer, { access: 'public', token: uploadToken });
+        const url = upload.url;
+        images.push({ image: url });
+      }
+    } catch (error) {
+      console.error("Upload error:", error);
+      return next(new ErrorHandler("Image upload failed", 500));
     }
-    
-    if(req.files && req.files.length > 0) {
-        req.files.forEach( file => {
-            let url = `${BASE_URL}/upload/blog/${file.originalname}`;
-            images.push({ image: url })
-        })
-    }
-    req.body.images = images;
+  }
 
+  // Assign the new images to req.body
+  req.body.images = images;
 
+  // Update the blog with the new data
+  blog = await blogModel.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+    runValidators: true
+  });
 
-    if (!blog) {
-      return res.status(404).json({
-        success: false,
-        message: "Blog not found",
-      });
-    }
+  res.status(200).json({
+    success: true,
+    blog
+  });
+});
 
-    blog = await blogModel.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true
-    });
-
-    res.status(200).json({
-      sucess: true,
-      blog
-    });
-  
-};
 
 
 

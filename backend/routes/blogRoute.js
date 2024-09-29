@@ -22,7 +22,7 @@ router.route('/blog/update/:id').put(isAuthendicatedUser,authorizeRole('user','a
 
 router.route('/blog/new').post(
     isAuthendicatedUser,
-    upload.array('images'), // Use multer for handling file uploads
+    upload.array('images'),
     createNewBlog
 );
 router.route('/admin/blogs').get(isAuthendicatedUser,authorizeRole('admin'),getAdminBlogs);
