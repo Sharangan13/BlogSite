@@ -5,6 +5,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import { Dropdown, Image} from 'react-bootstrap';
 import { logOut } from '../../actions/UserActions';
 import { IoCreateOutline } from "react-icons/io5";
+import logo from '../../images/logo.png';
 
 export default function Header(){
 
@@ -23,7 +24,7 @@ export default function Header(){
       <div className="col-12 col-md-3">
         <div className="navbar-brand">
           <Link to={"/"}>
-          <img width="150px" src="/images/logo.png" />
+          <img width="150px" src={logo} />
           </Link>
         </div>
       </div>
