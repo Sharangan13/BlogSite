@@ -95,7 +95,9 @@ exports.logoutUser = (req,res,next)=>{
         expires: new Date(Date.now()),
         httpOnly:true,
         secure:true,
-        sameSite: 'None'
+        sameSite: 'None',
+        domain: '.blog-site-two-tau.vercel.app',
+        path: '/',
     }).status(200).json({
         success:true,
         message:"Logout Succesfully"
