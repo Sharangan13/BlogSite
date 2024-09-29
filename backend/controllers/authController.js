@@ -90,19 +90,20 @@ exports.loginUser = catchAsyncError(async(req,res,next)=>{
 
 // 03. Logout User     URL - http://localhost:8000/api/sh/logout    -------------------------------------------------------------------
 
-exports.logoutUser = (req,res,next)=>{
-    res.cookie('token',null,{
-        expires: new Date(Date.now()),
-        httpOnly:true,
-        secure:true,
-        sameSite: 'None',
-        domain: '.blog-site-two-tau.vercel.app',
-        path: '/',
+exports.logoutUser = (req, res, next) => {
+    res.cookie('token','', {
+        expires: new Date(Date.now()),  // Expire the cookie immediately
+        httpOnly: true,                 // Prevent client-side JS access
+        secure: true,                   // Ensure the cookie is sent over HTTPS
+        sameSite: 'None',               // Allow cross-site requests
+        domain: 'blog-site-two-tau.vercel.app',  // Domain without 'https://'
+        path: '/',                      // Ensure this matches the path where the cookie was set
     }).status(200).json({
-        success:true,
-        message:"Logout Succesfully"
-    })
-}
+        success: true,
+        message: "Logout Successfully",
+    });
+};
+
 
 
 
