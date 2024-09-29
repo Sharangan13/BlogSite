@@ -82,10 +82,10 @@ exports.loginUser = catchAsyncError(async(req,res,next)=>{
 
 exports.logoutUser = (req, res, next) => {
     console.log("Logout initiated");
-    res.cookie('token',{
+    res.cookie('token',null,{
         expires: new Date(Date.now() - 1000),
         httpOnly: true,
-        // secure: true,
+        secure: true,
         sameSite: 'Strict',
         path: '/'
     }).status(200).json({

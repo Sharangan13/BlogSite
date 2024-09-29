@@ -1,8 +1,9 @@
-
+const { put } = require('@vercel/blob'); // Corrected import
 const catchAsyncError = require("../middlewares/catchAsyncError");
 const blogModel = require("../models/blogModel");
 const APIFeatures = require("../util/apiFeatures");
 const ErrorHandler = require("../util/errorHandler");
+
 
 // -------------------------------------Gust,User,Admin Functions--------------------------------------------------//
 
@@ -56,31 +57,43 @@ exports.getSingleBlog = async (req, res, next) => {
 
 // 02. Create New Blog       URL = http://localhost:8000/api/sh/blog/new      -------------------------------------------------------------------
 
-exports.createNewBlog = catchAsyncError(async(req, res, next) => {
+exports.createNewBlog = catchAsyncError(async (req, res, next) => {
+  const images = [];
+  const files = req.files;
 
+  // Check for the upload token
+  const uploadToken ="vercel_blob_rw_lUSA2go8ipySDpex_w6tss9owH4MW6R9MMQNpNOMIghabA3";
+  if (!uploadToken) {
+      console.error("Upload token not found!");
+      return next(new ErrorHandler("Upload token is missing", 500));
+  }
 
-  let images = []
-    let BASE_URL = process.env.BACKEND_URL;
-    if(process.env.NODE_ENV === "production"){
-        BASE_URL = `${req.protocol}://${req.get('host')}`
-    }
-    
-    if(req.files && req.files.length > 0) {
-        req.files.forEach( file => {
-            let url = `${BASE_URL}/upload/blog/${file.originalname}`;
-            images.push({ image: url })
-        })
-    }
+  try {
+      for (const file of files) {
+          console.log("Uploading:", file.originalname);
+          console.log("File Buffer:", file.buffer);
 
-    req.body.images = images;
+          const upload = await put(file.originalname, file.buffer, { access: 'public', token: uploadToken });
+          const url = upload.url;
+          images.push({ image: url });
+      }
+  } catch (error) {
+      console.error("Upload error:", error);
+      return next(new ErrorHandler("Image upload failed", 500));
+  }
 
+  req.body.images = images;
   req.body.authorId = req.user.id;
+
   const blog = await blogModel.create(req.body);
   res.status(201).json({
-    sucess: true,
-    blog
+      success: true,
+      blog,
   });
 });
+
+
+
 
 
 

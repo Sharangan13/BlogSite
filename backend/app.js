@@ -37,9 +37,10 @@ if(process.env.NODE_ENV ==='production'){
 }
 
 app.use(middlewareError);
+
 const corsOptions = {
     origin: 'https://blog-site-two-tau.vercel.app',
-    credentials: true, // Allow credentials (cookies) to be sent
+    credentials: true,
 };
 
 app.use(cors(corsOptions));
