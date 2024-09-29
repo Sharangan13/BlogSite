@@ -81,11 +81,12 @@ exports.loginUser = catchAsyncError(async(req,res,next)=>{
 // 03. Logout User     URL - http://localhost:8000/api/sh/logout    -------------------------------------------------------------------
 
 exports.logoutUser = (req,res,next)=>{
-    res.cookie('token',null,{
+    res.cookie('token','',{
         expires: new Date(Date.now()),
         httpOnly:true,
         secure:true,
-        sameSite: 'Strict'
+        sameSite: 'Strict',
+        path: '/'
     }).status(200).json({
         success:true,
         message:"Logout Succesfully"
