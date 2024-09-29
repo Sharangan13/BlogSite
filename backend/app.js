@@ -6,6 +6,8 @@ const middlewareError = require('./middlewares/error');
 const cookieParser= require("cookie-parser")
 const path = require("path")
 const dotenv = require('dotenv');
+const cors = require('cors');
+
 
 app.use(express.json());
 app.use(cookieParser());
@@ -35,4 +37,11 @@ if(process.env.NODE_ENV ==='production'){
 }
 
 app.use(middlewareError);
+const corsOptions = {
+    origin: 'https://blog-site-two-tau.vercel.app',
+    credentials: true, // Allow credentials (cookies) to be sent
+};
+
+app.use(cors(corsOptions));
+
 module.exports = app;
