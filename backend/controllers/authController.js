@@ -1,3 +1,4 @@
+const { put } = require('@vercel/blob'); 
 const { AsyncLocalStorage } = require("async_hooks");
 const catchAsyncError = require("../middlewares/catchAsyncError");
 const userModel =require("../models/userModel");
@@ -11,40 +12,49 @@ const { strict } = require("assert");
 
 // 01. Register User    URL- http://localhost:8000/api/sh/register    -------------------------------------------------------------------
 
-exports.registerUser = catchAsyncError( async (req, res, next)=>{
-    const {name,email,password} =req.body
+exports.registerUser = catchAsyncError(async (req, res, next) => {
+    const { name, email, password } = req.body;
     let avatar;
 
-    let BASE_URL=process.env.BACKEND_URL;
-    if(process.env.NODE_ENV==="production"){
-        BASE_URL=`${req.protocol}://${req.get('host')}`
+    // Check for the upload token
+    const uploadToken = "vercel_blob_rw_lUSA2go8ipySDpex_w6tss9owH4MW6R9MMQNpNOMIghabA3";
+    if (!uploadToken) {
+        console.error("Upload token not found!");
+        return next(new ErrorHandler("Upload token is missing", 500));
     }
-    if(req.file){
-        avatar=`${BASE_URL}/upload/user/${req.file.originalname}`
+
+    try {
+        // If there is a file uploaded, upload it to Vercel Blob storage
+        if (req.file) {
+            console.log("Uploading avatar:", req.file.originalname);
+
+            // Upload the avatar to Vercel Blob storage
+            const upload = await put(req.file.originalname, req.file.buffer, { access: 'public', token: uploadToken });
+            avatar = upload.url;  // Set the avatar URL from the uploaded file
+
+        } else {
+            avatar = ""; // Default avatar URL or leave empty if no file is uploaded
+        }
+
+        // Create the new user with avatar URL
+        const newUser = await userModel.create({
+            name,
+            email,
+            password,
+            avatar, // Store the uploaded avatar URL
+        });
+
+        // Send token for the new user
+        sendToken(newUser, 201, res);
+    } catch (err) {
+        if (err.code === 11000) {
+            const message = `This ${Object.keys(err.keyValue)[0]} is already used, please enter another ${Object.keys(err.keyValue)[0]}`;
+            return next(new ErrorHandler(message, 400));
+        }
+        return next(new ErrorHandler(err.message, 500));
     }
+});
 
- try {
-
-    const newUser = await userModel.create({
-        name,
-        email,
-        password,
-        avatar
-    });
-
-    sendToken(newUser,201,res)
-    
- } catch (err) {
-    if (err.code === 11000) {
-        const message = `This ${Object.keys(err.keyValue)[0]} already used please enter another ${Object.keys(err.keyValue)[0]}`;
-        return next(new ErrorHandler(message, 400));
-    }
-    return next (new ErrorHandler(err.message),500)
- }  
-  
-
-
-})
 
 
 
@@ -232,33 +242,46 @@ exports.updateProfile = catchAsyncError(async (req, res, next) => {
         email: req.body.email,
     };
 
-    let avatar;
-
-    // Determine base URL
-    let BASE_URL = process.env.BACKEND_URL || '';
-    if (process.env.NODE_ENV === 'production') {
-        BASE_URL = `${req.protocol}://${req.get('host')}`;
+    // Check for the upload token
+    const uploadToken = "vercel_blob_rw_lUSA2go8ipySDpex_w6tss9owH4MW6R9MMQNpNOMIghabA3";
+    if (!uploadToken) {
+        console.error("Upload token not found!");
+        return next(new ErrorHandler("Upload token is missing", 500));
     }
 
-    // Handle avatar upload
-    if (req.file) {
-        avatar = `${BASE_URL}/upload/user/${req.file.originalname}`;
-        newUserData.avatar = avatar;
+    try {
+        // Handle avatar upload if a file is provided
+        if (req.file && req.file.buffer) {
+            console.log("Uploading avatar:", req.file.originalname);
+
+            // Upload the avatar to Vercel Blob storage
+            const upload = await put(req.file.originalname, req.file.buffer, {
+                access: 'public',
+                token: uploadToken
+            });
+
+            // Store the URL of the uploaded image in newUserData
+            newUserData.avatar = upload.url;
+        }
+
+        // Update user profile with the new data
+        const user = await userModel.findByIdAndUpdate(req.user.id, newUserData, {
+            new: true,
+            runValidators: true,
+        });
+
+        // Send response
+        res.status(200).json({
+            success: true,
+            message: 'Profile updated',
+            user,
+        });
+    } catch (error) {
+        console.error("Upload error:", error);
+        return next(new ErrorHandler("Image upload failed", 500));
     }
-
-    // Update user profile
-    const user = await userModel.findByIdAndUpdate(req.user.id, newUserData, {
-        new: true,
-        runValidators: true,
-    });
-
-    // Send response
-    res.status(200).json({
-        success: true,
-        message: 'Profile updated',
-        user,
-    });
 });
+
 
 
 
