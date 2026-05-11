@@ -1,9 +1,8 @@
-const { put } = require('@vercel/blob'); 
+
 const catchAsyncError = require("../middlewares/catchAsyncError");
 const blogModel = require("../models/blogModel");
 const APIFeatures = require("../util/apiFeatures");
 const ErrorHandler = require("../util/errorHandler");
-
 
 // -------------------------------------Gust,User,Admin Functions--------------------------------------------------//
 
@@ -15,7 +14,7 @@ exports.getBlogs = async (req, res, next) => {
   const apiFeatures= new APIFeatures(blogModel.find(), req.query).search().filter(); 
   
   const blogs = await apiFeatures.query;
-  // await new Promise(resolve=>setTimeout(resolve,3000))    check loader working correct
+  // await new Promise(resolve=>setTimeout(resolve,5173))    check loader working correct
   // return next(new ErrorHandler("Testing msg............",400))  check toast loader to show error message 
   res.status(200).json({
     sucess: true,
@@ -57,105 +56,80 @@ exports.getSingleBlog = async (req, res, next) => {
 
 // 02. Create New Blog       URL = http://localhost:8000/api/sh/blog/new      -------------------------------------------------------------------
 
-exports.createNewBlog = catchAsyncError(async (req, res, next) => {
-  const images = [];
-  const files = req.files;
+exports.createNewBlog = catchAsyncError(async(req, res, next) => {
 
-  // Check for the upload token
-  const uploadToken ="vercel_blob_rw_lUSA2go8ipySDpex_w6tss9owH4MW6R9MMQNpNOMIghabA3";
-  if (!uploadToken) {
-      console.error("Upload token not found!");
-      return next(new ErrorHandler("Upload token is missing", 500));
-  }
 
-  try {
-      for (const file of files) {
-          console.log("Uploading:", file.originalname);
-          // console.log("File Buffer:", file.buffer);
+  let images = []
+    let BASE_URL = process.env.BACKEND_URL;
+    if(process.env.NODE_ENV === "production"){
+        BASE_URL = `${req.protocol}://${req.get('host')}`
+    }
+    
+    if(req.files && req.files.length > 0) {
+        req.files.forEach( file => {
+            let url = `${BASE_URL}/upload/blog/${file.originalname}`;
+            images.push({ image: url })
+        })
+    }
 
-          const upload = await put(file.originalname, file.buffer, { access: 'public', token: uploadToken });
-          const url = upload.url;
-          images.push({ image: url });
-      }
-  } catch (error) {
-      console.error("Upload error:", error);
-      return next(new ErrorHandler("Image upload failed", 500));
-  }
+    req.body.images = images;
 
-  req.body.images = images;
   req.body.authorId = req.user.id;
-
   const blog = await blogModel.create(req.body);
   res.status(201).json({
-      success: true,
-      blog,
+    sucess: true,
+    blog
   });
 });
-
-
-
 
 
 
 
 // 04. Update Blog         URL = http://localhost:8000/api/sh/blog/:id     -------------------------------------------------------------------
 
-exports.updateBlog = catchAsyncError(async (req, res, next) => {
+exports.updateBlog = async (req, res, next) => {
   let blog = await blogModel.findById(req.params.id);
 
-  if (!blog) {
-    return res.status(404).json({
-      success: false,
-      message: "Blog not found",
-    });
+  //image upload
+  let images = []
+
+  // if images not cleared we keep existing images
+  if(req.body.imagesCleared === 'false'){
+    images =blog.images;
   }
-
-  // Initialize an array for images
-  let images = [];
-
-  // If images are not cleared, keep existing images
-  if (req.body.imagesCleared === 'false') {
-    images = blog.images;
-  }
-
-  // Check for the upload token
-  const uploadToken = "vercel_blob_rw_lUSA2go8ipySDpex_w6tss9owH4MW6R9MMQNpNOMIghabA3";
-  if (!uploadToken) {
-    console.error("Upload token not found!");
-    return next(new ErrorHandler("Upload token is missing", 500));
-  }
-
-  // Handle new file uploads
-  if (req.files && req.files.length > 0) {
-    try {
-      for (const file of req.files) {
-        console.log("Uploading:", file.originalname);
-        // Upload the file to Vercel Blob
-        const upload = await put(file.originalname, file.buffer, { access: 'public', token: uploadToken });
-        const url = upload.url;
-        images.push({ image: url });
-      }
-    } catch (error) {
-      console.error("Upload error:", error);
-      return next(new ErrorHandler("Image upload failed", 500));
+    let BASE_URL = process.env.BACKEND_URL;
+    if(process.env.NODE_ENV === "production"){
+        BASE_URL = `${req.protocol}://${req.get('host')}`
     }
-  }
+    
+    if(req.files && req.files.length > 0) {
+        req.files.forEach( file => {
+            let url = `${BASE_URL}/upload/blog/${file.originalname}`;
+            images.push({ image: url })
+        })
+    }
+    req.body.images = images;
 
-  // Assign the new images to req.body
-  req.body.images = images;
 
-  // Update the blog with the new data
-  blog = await blogModel.findByIdAndUpdate(req.params.id, req.body, {
-    new: true,
-    runValidators: true
-  });
 
-  res.status(200).json({
-    success: true,
-    blog
-  });
-});
+    if (!blog) {
+      return res.status(404).json({
+        success: false,
+        message: "Blog not found",
+      });
+    }
 
+    blog = await blogModel.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true
+    });
+
+    res.status(200).json({
+      sucess: true,
+      blog
+    });
+  
+};
 
 
 
@@ -212,7 +186,7 @@ exports.getAdminBlogs = async (req, res, next) => {
   const apiFeatures= new APIFeatures(blogModel.find(), req.query).search().filter(); 
   
   const blogs = await apiFeatures.query;
-  // await new Promise(resolve=>setTimeout(resolve,3000))    check loader working correct
+  // await new Promise(resolve=>setTimeout(resolve,5173))    check loader working correct
   // return next(new ErrorHandler("Testing msg............",400))  check toast loader to show error message 
   res.status(200).json({
     sucess: true,

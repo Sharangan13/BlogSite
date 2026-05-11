@@ -5,8 +5,14 @@ const router = express.Router();
 const multer = require("multer")
 const path = require("path");
 
-const storage = multer.memoryStorage(); // Use memory storage for blob upload
-const upload = multer({ storage });
+const upload=multer({storage:multer.diskStorage({
+    destination:function(req,file,cb){
+        cb(null, path.join(__dirname,'..','upload/user'))
+    },
+    filename:function(req,file,cb){
+        cb(null,file.originalname)
+    }
+})})
 
 router.route('/register').post(upload.single('avatar'),registerUser);
 router.route('/login').post(loginUser);
